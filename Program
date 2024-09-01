@@ -1,0 +1,132 @@
+// © 2024 Om Patel [omspatel15@gmail.com]
+
+// Include the Servo library
+#include <Servo.h>
+
+// Define the pin numbers for the three servo motors
+const int servo1Pin = 9;
+const int servo2Pin = 10;
+const int servo3Pin = 11;
+
+// Define the pin numbers for the joystick's X and Y axes and the pushbutton
+int xPin = A0;
+int yPin = A1;
+int swPin = 2;
+
+// Initialize variables to store the values read from the joystick and pushbutton
+int xVal;
+int yVal;
+int swState;
+
+// Initialize variables to store the current angles of the three servo motors
+int servo1angle = 180;
+int servo2angle = 180;
+int servo3angle = 90;
+
+// Create instances of the Servo class for each servo motor
+Servo servo1;
+Servo servo2;
+Servo servo3;
+
+// Define the delay time between loop iterations
+int delayTime = 1;
+
+// Define the setup function, which runs once at the beginning of the program
+void setup()
+{
+  // Initialize serial communication at 9600 bps
+  Serial.begin(9600);
+  
+  // Set the pin modes for the joystick's X and Y axes and the pushbutton
+  pinMode(xPin, INPUT);
+  pinMode(yPin, INPUT);
+  pinMode(swPin, INPUT_PULLUP);
+  
+  // Set the pin modes for the three servo motors
+  pinMode(servo1Pin, OUTPUT);
+  pinMode(servo2Pin, OUTPUT);
+  pinMode(servo3Pin, OUTPUT);
+  
+  // Attach the servo motors to their respective pins
+  servo1.attach(servo1Pin);
+  servo2.attach(servo2Pin);
+  servo3.attach(servo3Pin);
+}
+
+// Define the loop function, which runs repeatedly after the setup function
+void loop()
+{
+  // Read the value from the joystick's X axis
+  xVal = analogRead(xPin);
+  
+  // Read the value from the joystick's Y axis
+  yVal = analogRead(yPin);
+  
+  // Read the state of the pushbutton
+  swState = digitalRead(swPin);
+  
+  // Print the values to the serial monitor
+  Serial.print("X: ");
+  Serial.print(xVal);
+  Serial.print(" | Y: ");
+  Serial.print(yVal);
+  Serial.print(" | Btn: ");
+  Serial.println(swState);
+
+  // If the joystick's X axis is moved left, increase the angle of servo 1
+  if(xVal <= 200){
+    servo1angle = servo1angle + 5;
+  }
+  
+  // If the joystick's X axis is moved right, decrease the angle of servo 1
+  if(xVal >= 800){
+    servo1angle = servo1angle - 5;
+  }
+
+  // If the joystick's Y axis is moved up, increase the angle of servo 2
+  if(yVal <= 200){
+    servo2angle = servo2angle + 5;
+  }
+  
+  // If the joystick's Y axis is moved down, decrease the angle of servo 2
+  if(yVal >= 800){
+    servo2angle = servo2angle - 5;
+  }
+
+  // If the pushbutton is pressed, decrease the angle of servo 3
+  if(swState == 0){
+    servo3angle = servo3angle - 90;
+  }
+  
+  // If the pushbutton is not pressed, increase the angle of servo 3
+  if(swState == 1){
+    servo3angle = servo3angle + 90;
+  }
+
+  // Limit the angle of servo 1 to within the range of 0 to 180 degrees
+  servo1angle = min(servo1angle, 180);
+  servo1angle = max(servo1angle, 0);
+  
+  // Limit the angle of servo 2 to within the range of 0 to 180 degrees
+  servo2angle = min(servo2angle, 180);
+  servo2angle = max(servo2angle, 0);
+  
+  // Limit the angle of servo 3 to within the range of 0 to 180 degrees
+  servo3angle = min(servo3angle, 180);
+  servo3angle = max(servo3angle, 0);
+
+  // Write the updated angles to the servo motors
+  servo1.write(servo1angle);
+  servo2.write(servo2angle);
+  servo3.write(servo3angle);
+  
+  // Print the current angles of the servo motors to the serial monitor
+  Serial.print(servo1angle);
+  Serial.print(" ");
+  Serial.print(servo2angle);
+  Serial.print(" ");
+  Serial.println(servo3angle);
+
+  // Wait for 100 milliseconds before the next iteration
+  delay(100);
+}
